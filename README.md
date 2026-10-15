@@ -6,104 +6,111 @@ SPDX-FileContributor: Ion Reguera <ion@stagelab.coop>
 ***
 -->
 
-# Stagesoft project FormitGo
+# FormitGo
 
 <img src="https://stagesoft.github.io/img/formitgo.jpg" height="200">
 
+**Open-source software for the synchronization and control of multimedia installations.**
 
-## About
+Modular architecture, precise synchronization, and centralized management.
 
-**FormitGo** and the **cuems** suite is a new open source software project from [Stagelab](https://www.stagelab.coop).
+Website: [stagelab.coop/formitgo](https://stagelab.coop/formitgo/)
+
+## What is FormitGo
+
+**FormitGo** plays back video, audio and DMX lighting cues in sync across several networked machines. It is built on the **cuems** suite (Cue Management System), developed by [Stagelab](https://www.stagelab.coop) for theater and live-entertainment technicians.
 
 <img src="https://stagesoft.github.io/img/original_fons_transparent.png" height=100>
 
-**cuems** suite will not only manage cues but also network connected external devices.
+- **Modular system.** One machine acts as the main controller, while the others function as client nodes. The power needed to manage multimedia content is distributed across multiple devices, instead of relying on a single centralized machine.
+- **Precise synchronization.** Network-transmitted timecode with a resolution of up to a quarter of a frame keeps every element of your installation in sync. If any slight mismatch occurs, the system automatically and continuously readjusts.
+- **Optimized installation.** You only need one network cable to connect each node, so devices can be placed exactly where they are needed: next to the projector, screen, or sound equipment.
+- **Centralized management.** FormitGo is managed through a web interface, from any device connected to your local network, whether via cable or WiFi.
+- **Simple installation.** FormitGo is a plug-and-play system: a documented power-up and self-configuration protocol makes it adjust itself automatically just by being turned on in a specific way.
+- **International.** The interface is available in Catalan, Spanish, and English.
 
-Its main audience is theatre and live entertainment technicians.
+## How it works
 
-cuems will try to reuse and improve other open source projects such as:
-
-* [xjadeo](https://github.com/stagesoft/xjadeo)
-
-cuems will generate new projects from scratch like:
-
-* [cuems-engine](https://github.com/stagesoft/cuems-engine)
-* [cuems-editor](https://github.com/stagesoft/cuems-editor)
-* [cuems-utils](https://github.com/stagesoft/cuems-utils)
-* [libmtcmaster](https://github.com/stagesoft/libmtcmaster)
-* [cuems-audioplayer](https://github.com/stagesoft/cuems-audioplayer)
-
-
-## Documentation API
-
-All technical documentation is available at it's corresponding GitHub Pages site as `https://stagesoft.github.io/<REPOSITORY_NAME>/`
-
-
-## Stagesoft packages
-
-You can find our repositories at [Stagesoft Github page](https://github.com/stagesoft).
-
-And our packages repository at [Stagesoft package repository](https://repo.stagelab.coop)
-
-(debian 10 packages, amd64, dbgsym and source)
-
-______
-
-**Instructions to add the repo to debian 10 buster:**
-
-### via keyring directory (recommended)
-
-Add the signing key to your keyring:
-```bash
-> wget -O- https://repo.stagelab.coop/repo.stagelab.key | \
-    gpg --dearmor --yes \
-    --output /usr/share/keyrings/stagelab.gpg
-
-> echo "deb [arch=amd64 signed-by=/usr/share/keyrings/stagelab.gpg] https://repo.stagelab.coop/debian buster main" | \
-    tee -a /etc/apt/sources.list.d/stagelab.list
+```text
+Browser (any device on the local network)
+   |  HTTP + WebSocket
+   v
+Controller   cuems-frontend · cuems-editor · cuems-engine
+   |  network timecode (MTC over RTP-MIDI) + cluster bus
+   v
+Nodes        cuems-engine ─┬─ video  → cuems-videocomposer
+                           ├─ audio  → cuems-audioplayer (JACK)
+                           ├─ DMX    → cuems-dmxplayer → OLA
+                           └─ fades  → gradient-motion-engine
 ```
 
-For non-root users, use `sudo` before the `gpg` and `tee` commands above.
+The controller also works as a node, so a single machine can run a whole show.
 
-For more information on signing packages, see the [Debian wiki](https://wiki.debian.org/SecureApt#Settingupasecureaptrepository)
+## Components
 
+### Core
 
-### via apt-key (old way)
-First add the key used to sing the packages & repo:
+| Repository | What it does |
+| --- | --- |
+| [cuems-engine](https://github.com/stagesoft/cuems-engine) | Loads projects, generates the timecode and runs the cues on the controller and on every node. |
+| [cuems-editor](https://github.com/stagesoft/cuems-editor) | Back end of the web interface: multi-user project editing and media library. |
+| [cuems-frontend](https://github.com/stagesoft/cuems-frontend) | Web interface for programming and running shows. |
+| [cuems-videocomposer](https://github.com/stagesoft/cuems-videocomposer) | Multi-layer video compositor with hardware decoding. |
+| [cuems-audioplayer](https://github.com/stagesoft/cuems-audioplayer) | Audio player for JACK. |
+| [cuems-dmxplayer](https://github.com/stagesoft/cuems-dmxplayer) | DMX lighting player with fades, output through OLA. |
+| [gradient-motion-engine](https://github.com/stagesoft/gradient-motion-engine) | Timecode-driven fades and motion. |
+| [cuems-utils](https://github.com/stagesoft/cuems-utils) | Shared Python library: cue model, XML schemas, configuration. |
+| [cuems-common](https://github.com/stagesoft/cuems-common) | System configuration, services, controller and node roles, WiFi access point. |
+| [cuems-midi-connector](https://github.com/stagesoft/cuems-midi-connector) | Wires the MIDI timecode on every machine automatically. |
+| [cuems-nodeconf](https://github.com/stagesoft/cuems-nodeconf) | Discovers and adopts nodes on the local network. |
+| [rtpmidid](https://github.com/stagesoft/rtpmidid) | Sends the timecode between machines over RTP-MIDI (fork). |
 
-`wget -q -O - https://repo.stagelab.coop/repo.stagelab.key |sudo apt-key add -`
+### Libraries
 
-Then add the repo to a new sources.list.d/ file:
+| Repository | What it does |
+| --- | --- |
+| [libmtcmaster](https://github.com/stagesoft/libmtcmaster) | MIDI Time Code generator. |
+| [mtcreceiver](https://github.com/stagesoft/mtcreceiver) | MIDI Time Code receiver used by the players. |
+| [oscreceiver](https://github.com/stagesoft/oscreceiver) | OSC receiver used by the players. |
+| [cuems-mediadecoder](https://github.com/stagesoft/cuems-mediadecoder) | Shared FFmpeg decoding library. |
+| [cuemslogger](https://github.com/stagesoft/cuemslogger) | System log wrapper for the C++ components. |
 
-`sudo wget -O /etc/apt/sources.list.d/stagelab.list https://repo.stagelab.coop/stagelab.list`
+### Third-party software we maintain forks of
 
-Or manually:
+| Repository | What it does |
+| --- | --- |
+| [ola](https://github.com/stagesoft/ola) | DMX output (Open Lighting Architecture), with support for the Eurolite USB-DMX512 PRO MK2 interface. |
+| [jack-volume](https://github.com/stagesoft/jack-volume) | Audio volume control on JACK, used by cuems-audioplayer. |
 
-`deb https://repo.stagelab.coop/debian buster main`
+We also keep builds of [jackd2](https://github.com/stagesoft/jackd2) and [libossia](https://github.com/stagesoft/libossia) adapted to our systems, with no functional changes.
 
-`deb-src https://repo.stagelab.coop/debian buster main`
-____
+## Installation
 
+FormitGo is already functional and in use in live shows and installations, and it is under active development towards its first release (Release 1). There is no standard installation method yet. It will be documented here when Release 1 is published.
 
-## Packages
+FormitGo runs on **Debian 12 (bookworm), amd64**. In the meantime, you are free to install it from the source code on GitHub and experiment with it: each component's README explains how to build it. Questions are welcome on [Discord](https://discord.gg/VfDjFDSnGW) and in [GitHub Discussions](https://github.com/stagesoft/FormitGo/discussions). For a ready-to-use installation, contact Stagelab at info@stagelab.coop.
 
-For a complete list of software under development by Stagelab, see [Stagesoft GitHub page](https://github.com/stagesoft).
+## Documentation
 
-list of packages currently on the repository:
+Each repository documents itself in its README. Some also publish technical documentation on GitHub Pages:
+[cuems-engine](https://stagesoft.github.io/cuems-engine/),
+[cuems-editor](https://stagesoft.github.io/cuems-editor/),
+[cuems-utils](https://stagesoft.github.io/cuems-utils/),
+[cuems-videocomposer](https://stagesoft.github.io/cuems-videocomposer/),
+[cuems-nodeconf](https://stagesoft.github.io/cuems-nodeconf/) and
+[gradient-motion-engine](https://stagesoft.github.io/gradient-motion-engine/).
 
-(work in progress, unstable packages at the moment for testing purpouses)
-* cuems-audioplayer
-* libmtcmaster
-* xjadeo
-* jackd2
-* libossia
-* cmake
- 
+## Community
+
+- Chat with users and developers on [Discord](https://discord.gg/VfDjFDSnGW).
+- Ask questions and share ideas in [GitHub Discussions](https://github.com/stagesoft/FormitGo/discussions).
+- Report bugs in the issues of the repository concerned.
+
 ## License
 
 This project is licensed under the terms of the **GNU General Public License v3.0 or later (GPL-3.0-or-later)**.
 
-Being free software, **FormitGo** and the **cuems** suite do not depend on any single company: any group of developers can pick up the project and carry it on. Your live shows and multimedia installations stay under your control, and your equipment will not become obsolete or unusable because a vendor drops support.
+Being open-source software, **FormitGo** and the **cuems** suite do not depend on a single company: any group of developers can continue the project. Your infrastructure will never become obsolete or unsupported, and your equipment remains functional and versatile.
 
 See the [LICENSE](https://github.com/stagesoft/FormitGo/blob/master/LICENSE) file for the full license text.
 
@@ -119,6 +126,7 @@ This project is funded by:
 
 ![funded_by_ministerio](https://stagesoft.github.io/img/ministerio.svg)
 
-This project had the initial collaboration of [bTactic](https://www.btactic.com):
+## Acknowledgements
 
-![bTactic logo](https://www.btactic.com/wp-content/uploads/2018/10/logo-btactic.png)
+- The first versions of FormitGo were developed in collaboration with [bTactic](https://www.btactic.com).
+- cuems-videocomposer is inspired by and partially based on [xjadeo](https://xjadeo.sourceforge.net/) by Robin Gareus and on [mpv](https://mpv.io/).
