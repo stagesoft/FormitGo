@@ -1,3 +1,11 @@
+<!--
+***
+SPDX-FileCopyrightText: 2020 Stagelab Coop SCCL
+SPDX-License-Identifier: GPL-3.0-or-later
+SPDX-FileContributor: Ion Reguera <ion@stagelab.coop>
+***
+-->
+
 # Stagesoft project FormitGo
 
 <img src="https://stagesoft.github.io/img/formitgo.jpg" height="200">
@@ -91,6 +99,14 @@ list of packages currently on the repository:
 * libossia
 * cmake
  
+## License
+
+This project is licensed under the terms of the **GNU General Public License v3.0 or later (GPL-3.0-or-later)**.
+
+Being free software, **FormitGo** and the **cuems** suite do not depend on any single company: any group of developers can pick up the project and carry it on. Your live shows and multimedia installations stay under your control, and your equipment will not become obsolete or unusable because a vendor drops support.
+
+See the [LICENSE](https://github.com/stagesoft/FormitGo/blob/master/LICENSE) file for the full license text.
+
 ## Funding
 
 This project is promoted by:
