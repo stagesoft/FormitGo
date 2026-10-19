@@ -46,6 +46,10 @@ Nodes        cuems-engine ─┬─ video  → cuems-videocomposer
 
 The controller also works as a node, so a single machine can run a whole show.
 
+## Authoring notes
+
+- **Looping audio with video.** Audio and video stay in sync across the passes of a loop only if **(A) their durations are exactly the same, or (B) they are in the same container** (one file: the audio player extracts the audio track). Two separate files of different lengths drift apart by the difference on every pass. Audio extracted from a video into a separate file comes out slightly longer than the video (the codec's padding), so keep audio and video that loop together in one file. The engine warns at load when two loops started together are close in length but not equal.
+
 ## Components
 
 ### Core
